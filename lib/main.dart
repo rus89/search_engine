@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:search_engine/models/synonym_entry.dart';
@@ -21,6 +23,7 @@ class _SearchAppState extends State<SearchApp> {
   List<SynonymEntry> filteredEntries = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -33,19 +36,23 @@ class _SearchAppState extends State<SearchApp> {
   void dispose() {
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
   void _onSearchChanged() {
-    final query = _searchController.text.toLowerCase();
-    setState(() {
-      filteredEntries = synonymEntries.where((entry) {
-        final wordMatch = entry.word.toLowerCase().contains(query);
-        final synonymMatch = entry.synonyms.any(
-          (syn) => syn.toLowerCase().contains(query),
-        );
-        return wordMatch || synonymMatch;
-      }).toList();
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      final query = _searchController.text.toLowerCase();
+      setState(() {
+        filteredEntries = synonymEntries.where((entry) {
+          final wordMatch = entry.word.toLowerCase().contains(query);
+          final synonymMatch = entry.synonyms.any(
+            (syn) => syn.toLowerCase().contains(query),
+          );
+          return wordMatch || synonymMatch;
+        }).toList();
+      });
     });
   }
 
@@ -139,6 +146,44 @@ class SearchWidget extends StatelessWidget {
     return matches;
   }
 
+  Widget _searchResultsList() {
+    final query = searchController.text;
+    if (query.isEmpty) {
+      return const Center(child: Text('Please enter a search term.'));
+    } else if (synonymEntries.isEmpty) {
+      return const Center(child: Text('No results found.'));
+    }
+
+    return ListView.builder(
+      itemCount: synonymEntries.length,
+      itemBuilder: (context, index) {
+        final entry = synonymEntries[index];
+        return ListTile(
+          title: RichText(
+            text: TextSpan(
+              style: const TextStyle(color: Colors.black, fontSize: 18),
+              children: _highlightMatches(entry.word, query),
+            ),
+          ),
+          subtitle: Wrap(
+            spacing: 8.0,
+            children: entry.synonyms.map((syn) {
+              return Chip(
+                label: RichText(
+                  text: TextSpan(
+                    style: const TextStyle(color: Colors.white),
+                    children: _highlightMatches(syn, query),
+                  ),
+                ),
+                backgroundColor: Colors.blue,
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -153,34 +198,7 @@ class SearchWidget extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: synonymEntries.length,
-            itemBuilder: (context, index) {
-              final entry = synonymEntries[index];
-              return ListTile(
-                title: RichText(
-                  text: TextSpan(
-                    style: DefaultTextStyle.of(context).style,
-                    children: _highlightMatches(
-                      entry.word,
-                      searchController.text,
-                    ),
-                  ),
-                ),
-                subtitle: RichText(
-                  text: TextSpan(
-                    style: DefaultTextStyle.of(context).style,
-                    children: _highlightMatches(
-                      entry.synonyms.join(', '),
-                      searchController.text,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
+        Expanded(child: _searchResultsList()),
       ],
     );
   }
