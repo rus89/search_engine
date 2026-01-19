@@ -1,0 +1,118 @@
+[
+  {
+    "word": "fast",
+    "synonyms": ["quick", "speedy", "swift", "rapid"]
+  },
+  {
+    "word": "happy",
+    "synonyms": ["joyful", "cheerful", "content", "pleased"]
+  },
+  {
+    "word": "smart",
+    "synonyms": ["intelligent", "clever", "bright", "wise"]
+  },
+  {
+    "word": "strong",
+    "synonyms": ["powerful", "sturdy", "robust", "tough"]
+  },
+  {
+    "word": "beautiful",
+    "synonyms": ["attractive", "pretty", "lovely", "gorgeous"]
+  },
+  {
+    "word": "brave",
+    "synonyms": ["courageous", "valiant", "fearless", "bold"]
+  },
+  {
+    "word": "kind",
+    "synonyms": ["compassionate", "considerate", "gentle", "benevolent"]
+  },
+  {
+    "word": "funny",
+    "synonyms": ["humorous", "amusing", "comical", "entertaining"]
+  },
+  {
+    "word": "easy",
+    "synonyms": ["simple", "straightforward", "effortless", "uncomplicated"]
+  },
+  {
+    "word": "difficult",
+    "synonyms": ["challenging", "hard", "arduous", "tough"]
+  },
+  {
+    "word": "large",
+    "synonyms": ["big", "huge", "enormous", "gigantic"]
+  },
+  {
+    "word": "small",
+    "synonyms": ["tiny", "miniature", "little", "compact"]
+  },
+  {
+    "word": "cold",
+    "synonyms": ["chilly", "freezing", "frigid", "cool"]
+  },
+  {
+    "word": "hot",
+    "synonyms": ["warm", "scorching", "boiling", "sweltering"]
+  },
+  {
+    "word": "bright",
+    "synonyms": ["luminous", "shining", "radiant", "vivid"]
+  },
+  {
+    "word": "dark",
+    "synonyms": ["dim", "gloomy", "shadowy", "murky"]
+  },
+  {
+    "word": "weak",
+    "synonyms": ["frail", "feeble", "fragile", "delicate"]
+  },
+  {
+    "word": "clean",
+    "synonyms": ["tidy", "neat", "spotless", "pristine"]
+  },
+  {
+    "word": "dirty",
+    "synonyms": ["filthy", "grimy", "soiled", "unclean"]
+  },
+  {
+    "word": "quick",
+    "synonyms": ["fast", "speedy", "swift", "rapid"]
+  },
+  {
+    "word": "slow",
+    "synonyms": ["lethargic", "sluggish", "unhurried", "delayed"]
+  },
+  {
+    "word": "loud",
+    "synonyms": ["noisy", "boisterous", "clamorous", "deafening"]
+  },
+  {
+    "word": "quiet",
+    "synonyms": ["silent", "hushed", "muted", "peaceful"]
+  },
+  {
+    "word": "rich",
+    "synonyms": ["wealthy", "affluent", "prosperous", "well-off"]
+  },
+  {
+    "word": "poor",
+    "synonyms": ["impoverished", "needy", "destitute", "underprivileged"]
+  },
+  {
+    "word": "friendly",
+    "synonyms": ["amiable", "cordial", "sociable", "approachable"]
+  },
+  {
+    "word": "hostile",
+    "synonyms": ["unfriendly", "antagonistic", "aggressive", "adversarial"]
+  },
+  {
+    "word": "ancient",
+    "synonyms": ["old", "antique", "archaic", "prehistoric"]
+  },
+  {
+    "word": "modern",
+    "synonyms": ["contemporary", "current", "up-to-date", "new"]
+  }
+]

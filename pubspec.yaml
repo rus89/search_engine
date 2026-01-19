@@ -1,7 +1,7 @@
 name: search_engine
-description: "A new Flutter project."
-publish_to: 'none'
-version: 0.1.0
+description: "A Flutter project for search engine functionality."
+publish_to: "none"
+version: 0.1.0+1
 
 environment:
   sdk: ^3.10.7
@@ -17,3 +17,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/data/synonyms.json
