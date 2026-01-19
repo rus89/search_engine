@@ -18,12 +18,35 @@ class SearchApp extends StatefulWidget {
 //----------------------------------------------------------------------
 class _SearchAppState extends State<SearchApp> {
   List<SynonymEntry> synonymEntries = [];
+  List<SynonymEntry> filteredEntries = [];
   bool _isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(_onSearchChanged);
     _loadSynonymData();
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      filteredEntries = synonymEntries.where((entry) {
+        final wordMatch = entry.word.toLowerCase().contains(query);
+        final synonymMatch = entry.synonyms.any(
+          (syn) => syn.toLowerCase().contains(query),
+        );
+        return wordMatch || synonymMatch;
+      }).toList();
+    });
   }
 
   Future<void> _loadSynonymData() async {
@@ -36,6 +59,7 @@ class _SearchAppState extends State<SearchApp> {
         .toList();
     setState(() {
       synonymEntries = loadedEntries;
+      filteredEntries = loadedEntries;
       _isLoading = false;
     });
   }
@@ -43,7 +67,11 @@ class _SearchAppState extends State<SearchApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomePage(synonymEntries: synonymEntries, isLoading: _isLoading),
+      home: HomePage(
+        synonymEntries: filteredEntries,
+        isLoading: _isLoading,
+        searchController: _searchController,
+      ),
     );
   }
 }
@@ -51,11 +79,13 @@ class _SearchAppState extends State<SearchApp> {
 class HomePage extends StatelessWidget {
   final List<SynonymEntry> synonymEntries;
   final bool isLoading;
+  final TextEditingController searchController;
 
   const HomePage({
     super.key,
     required this.synonymEntries,
     required this.isLoading,
+    required this.searchController,
   });
 
   @override
@@ -64,16 +94,94 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(title: const Text('Synonym Search Engine')),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: synonymEntries.length,
-              itemBuilder: (context, index) {
-                final entry = synonymEntries[index];
-                return ListTile(
-                  title: Text(entry.word),
-                  subtitle: Text(entry.synonyms.join(', ')),
-                );
-              },
+          : SearchWidget(
+              synonymEntries: synonymEntries,
+              searchController: searchController,
             ),
+    );
+  }
+}
+
+class SearchWidget extends StatelessWidget {
+  final List<SynonymEntry> synonymEntries;
+  final TextEditingController searchController;
+
+  const SearchWidget({
+    super.key,
+    required this.synonymEntries,
+    required this.searchController,
+  });
+
+  List<TextSpan> _highlightMatches(String source, String query) {
+    if (query.isEmpty) {
+      return [TextSpan(text: source)];
+    }
+    final matches = <TextSpan>[];
+    final queryLower = query.toLowerCase();
+    final sourceLower = source.toLowerCase();
+    int start = 0;
+    int index;
+    while ((index = sourceLower.indexOf(queryLower, start)) != -1) {
+      if (index > start) {
+        matches.add(TextSpan(text: source.substring(start, index)));
+      }
+      matches.add(
+        TextSpan(
+          text: source.substring(index, index + query.length),
+          style: const TextStyle(backgroundColor: Colors.yellow),
+        ),
+      );
+      start = index + query.length;
+    }
+    if (start < source.length) {
+      matches.add(TextSpan(text: source.substring(start)));
+    }
+    return matches;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: searchController,
+            decoration: const InputDecoration(
+              labelText: 'Search for a word or synonym',
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: synonymEntries.length,
+            itemBuilder: (context, index) {
+              final entry = synonymEntries[index];
+              return ListTile(
+                title: RichText(
+                  text: TextSpan(
+                    style: DefaultTextStyle.of(context).style,
+                    children: _highlightMatches(
+                      entry.word,
+                      searchController.text,
+                    ),
+                  ),
+                ),
+                subtitle: RichText(
+                  text: TextSpan(
+                    style: DefaultTextStyle.of(context).style,
+                    children: _highlightMatches(
+                      entry.synonyms.join(', '),
+                      searchController.text,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
